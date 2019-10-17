@@ -1,29 +1,31 @@
 import { getRandomInt } from './utils';
 
 let squares: NodeListOf<HTMLDivElement>;
-let wrongAnswers: number;
-
+let message: HTMLElement;
 export function runApp() {
-    console.log('ready to party');
-    wrongAnswers = 0;
-    // find all the squares
+    message = document.getElementById('message') as HTMLElement;
+
     squares = document.querySelectorAll('.square') as NodeListOf<HTMLDivElement>;
     const secret = getSecretNumber();
 
     squares.forEach((sq, index) => {
         if (index === secret) {
-            sq.dataset.secret = 'true';  // the dataset api only takes strings
+            sq.dataset.secret = 'true';
         }
         sq.addEventListener('click', handleClick);
     });
+
 }
 
-function handleClick() {
+
+let tries = 0;
+
+function handleClick(e: any) {
+    // console.log(e);
     const clickedSquare = this as HTMLDivElement;
-    const message = document.getElementById('message') as HTMLElement;
     if (clickedSquare.dataset.secret === 'true') {
         clickedSquare.classList.add('winner');
-        message.innerText = 'WowwWWWWWwwwwwWw you found ittttttttttttt';
+        message.innerText = 'Woah! Awesome! You Found it! Wow!';
         squares.forEach(s => {
             if (s !== clickedSquare) {
                 s.classList.add('loser');
@@ -32,18 +34,20 @@ function handleClick() {
         });
     } else {
         clickedSquare.classList.add('loser');
-        wrongAnswers++;
-        if (squares.length === wrongAnswers + 1) {
-            message.innerText = 'YOU LOSE';
-            squares.forEach(s => {
-                if (!s.classList.contains('loser')) {
-                    s.classList.add('winner');
+        tries++;
+        if (tries === 5) {
+            squares.forEach(sq => {
+                if (sq.dataset.secret === 'true') {
+                    sq.classList.add('winner');
+                } else {
+                    sq.classList.add('loser');
                 }
+                message.innerText = 'Wow! You Suck! I wouldn\'t play the lottery if I were you!';
             });
         }
     }
-    console.log(this);
 }
+
 
 function getSecretNumber() {
     return getRandomInt(0, 5);
