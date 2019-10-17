@@ -1,9 +1,11 @@
 import { getRandomInt } from './utils';
 
 let squares: NodeListOf<HTMLDivElement>;
+let wrongAnswers: number;
+
 export function runApp() {
     console.log('ready to party');
-
+    wrongAnswers = 0;
     // find all the squares
     squares = document.querySelectorAll('.square') as NodeListOf<HTMLDivElement>;
     const secret = getSecretNumber();
@@ -14,25 +16,31 @@ export function runApp() {
         }
         sq.addEventListener('click', handleClick);
     });
-
-    // Pick one as the secret square and "mark it"
-
-    // Make it so that when the player clicks the square
 }
 
 function handleClick() {
     const clickedSquare = this as HTMLDivElement;
+    const message = document.getElementById('message') as HTMLElement;
     if (clickedSquare.dataset.secret === 'true') {
         clickedSquare.classList.add('winner');
-        const message = document.getElementById('message') as HTMLElement;
         message.innerText = 'WowwWWWWWwwwwwWw you found ittttttttttttt';
         squares.forEach(s => {
             if (s !== clickedSquare) {
                 s.classList.add('loser');
+                s.removeEventListener('click', handleClick);
             }
         });
     } else {
         clickedSquare.classList.add('loser');
+        wrongAnswers++;
+        if (squares.length === wrongAnswers + 1) {
+            message.innerText = 'YOU LOSE';
+            squares.forEach(s => {
+                if (!s.classList.contains('loser')) {
+                    s.classList.add('winner');
+                }
+            });
+        }
     }
     console.log(this);
 }
